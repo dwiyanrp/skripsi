@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Access Management</h1>
+
+    <div class="row">
+      <div class="col">
+        <h2 id="instructor"><b>Manager</b> :</h2>
+      </div>
+      <div class="col">
+        <table id="myTable">
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+
+    <div class="form-group">
+      <label for="form_accounts">Select manager:</label>
+      <select class="form-control" id="form_accounts" onchange="changeManager(this.value)"></select>
+    </div>
+
+    <div class="form-group">
+      <label for="name" class="control-label">Instructor Name</label>
+      <input class="form-control" id="name" type="text">
+    </div>
+
+    <button id="submit-update-manager" class="btn btn-primary">Update Manager</button>
+
+    <hr>
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="add-device-id" class="control-label">Add Device</label>
+          <input class="form-control" id="add-device-id" type="text" placeholder="(MAC Address)">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="add-device-type">Device Type (select one)</label>
+          <select class="form-control" id="add-device-type">
+            <option value="1">TV</option>
+            <option value="2">Lamp</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button id="submit-add-device" class="btn btn-primary">Add Device</button>
+  </div>
+
+  <script> // Init Web3 & Contract
+    var myTable = $('#myTable').DataTable();
+
+    if (typeof web3 !== 'undefined') {
+      web3 = new Web3(web3.currentProvider);
+    } else {
+      web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+    
+    web3.eth.accounts.forEach(element => {
+      $("#form_accounts").append(`<option value="${element}">${element}</option>`);
+    });
+
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+    var accessContract = web3.eth.contract([ { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes20" }, { "name": "_deviceType", "type": "uint16" } ], "name": "addDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes20" }, { "name": "_managerAddr", "type": "address" } ], "name": "removeAccess", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes20" }, { "name": "_managerAddr", "type": "address" } ], "name": "getAccess", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes20" } ], "name": "removeDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getManager", "outputs": [ { "name": "", "type": "address" }, { "name": "", "type": "bytes20" }, { "name": "", "type": "bytes20[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes20" }, { "name": "_managerAddr", "type": "address" }, { "name": "_startTime", "type": "uint32" }, { "name": "_endTime", "type": "uint32" } ], "name": "addAccess", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_name", "type": "bytes20" } ], "name": "setManager", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes20" } ], "name": "getDevice", "outputs": [ { "name": "", "type": "bytes20" }, { "name": "", "type": "uint256" }, { "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "name", "type": "bytes20" } ], "name": "ManagerEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "typeEvent", "type": "int8" }, { "indexed": false, "name": "deviceID", "type": "bytes20" } ], "name": "DeviceEvent", "type": "event" } ]);
+    var Access = accessContract.at("0x3104dd7ce8823846bff4f96f2ed6d8fec5d6fd71");
+
+		Access.getManager(function (error, result) {
+			$("#loader").hide();
+			$("#instructor").html("<b>Manager</b> : " + web3.toAscii(result[1]));
+			result[2].forEach(element => {
+				myTable.row.add([element, `<button type="button" class="btn btn-danger btn-sm" value="${element}")">Remove</button>`]).draw();
+				// myTable.row.add([element, `<button type="button" class="btn btn-danger btn-sm" onclick="removeDevice('${element}')">Remove</button>`]).draw();
+			});
+		});
+
+    var managerEvent = Access.ManagerEvent();
+    var deviceEvent = Access.DeviceEvent();
+  </script>
+
+  <script>
+    managerEvent.watch(function (error, result) {
+      if (!error) {
+        $("#loader").hide();
+        $("#instructor").html("<b>Manager</b> : " + web3.toAscii(result.args.name));
+      } else {
+        $("#loader").hide();
+        console.log(error);
+      }
+    });
+		
+		var isInit = true;
+    deviceEvent.watch(function (error, result) {
+      if (!error) {
+        $("#loader").hide();
+				if(!isInit) {
+					myTable.row.add([result.args.deviceID, `<button class="btn btn-danger">Remove</button>`]).draw(false);
+				} else {
+					isInit = false;
+				}
+      } else {
+        $("#loader").hide();
+        console.log(error);
+      }
+    });
+
+    $("#submit-update-manager").click(function () {
+      $("#loader").show();
+      Access.setManager($("#name").val(), (error, result) => {
+        if (error) {
+          $("#loader").hide();
+          console.log("Error");
+        }
+      });
+    });
+
+		// Add Device
+    $("#submit-add-device").click(function () {
+      $("#loader").show();
+      Access.addDevice($("#add-device-id").val(), $("#add-device-type").val(), {gas: 200000}, (error, result) => {
+        if(error) {
+          $("#loader").hide();
+          console.log(error);
+        }
+      })
+    });
+
+		// Remove Device
+		$('#myTable tbody').on( 'click', 'button', function () {
+			Access.removeDevice($(this).val(), function (error, result) {
+				console.log(error)
+				if(!error) {
+					myTable
+						.row( $(this).parents('tr') )
+						.remove()
+						.draw();
+				}
+			});
+		});
+  </script>
+
+  <script> // Actions
+    function changeManager(managerAddr) {
+			myTable.clear().draw();
+      $("#loader").show();
+      web3.eth.defaultAccount = managerAddr;
+      Access.getManager(function (error, result) {
+        $("#loader").hide();
+        $("#instructor").html("<b>Manager</b> : " + web3.toAscii(result[1]));
+				result[2].forEach(element => {
+					myTable.row.add([element, `<button class="btn btn-danger">Remove</button>`]).draw();
+				});
+      });
+    }
+
+		function removeDevice(deviceID) {
+      $("#loader").show();
+
+			console.log(deviceID);
+		}
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+body {
+  background-color:#F0F0F0;
+  padding: 2em;
+  font-family: 'Raleway','Source Sans Pro', 'Arial';
+}
+
+#loader {
+  width: 100px;
+  display:none;
+}
