@@ -1,0 +1,10 @@
+geth --datadir test1 init genesis.json
+geth --datadir test1 account new
+geth --datadir test1 --rpc --rpccorsdomain "*" --rpcapi db,eth,net,web3,personal,miner --unlock 0 console
+
+eth.getBalance(eth.coinbase)
+web3.fromWei(eth.getBalance(eth.coinbase), "ether")
+
+miner.setEtherbase(eth.accounts[0])
+miner.start(1)
+miner.setEtherbase(eth.accounts[0])
