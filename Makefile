@@ -1,7 +1,7 @@
 init:
-	@geth --datadir blockchain/1 account new --password password.txt
-	@geth --datadir blockchain/1 init genesis.json
-	@echo " >> Block 1 created"
+	@geth --datadir blockchain/main account new --password password.txt
+	@geth --datadir blockchain/main init genesis.json
+	@echo " >> Block main created"
 	@geth --datadir blockchain/2 account new --password password.txt
 	@geth --datadir blockchain/2 init genesis.json
 	@echo " >> Block 2 created"
@@ -12,23 +12,32 @@ init:
 delete:
 	@rm -rf ./blockchain
 
-run-1:
-	@geth --datadir ./blockchain/1 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 10001 --port 30001
+run:
+	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303
 
 run-2:
-	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 10002 --port 30002
+	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304
 
 run-3:
-	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 10003 --port 30003
+	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305
 
-attach-1:
-	@geth attach ./blockchain/1/geth.ipc
+attach:
+	@geth attach ./blockchain/main/geth.ipc
 
 attach-2:
 	@geth attach ./blockchain/2/geth.ipc
 
+attach-3:
+	@geth attach ./blockchain/3/geth.ipc
+
 accounts:
-	@geth --datadir ./blockchain/1 account list
+	@geth --datadir ./blockchain/main account list
+
+accounts-2:
+	@geth --datadir ./blockchain/2 account list
+
+accounts-3:
+	@geth --datadir ./blockchain/3 account list
 
 static-nodes:
-	@tee blockchain/1/static-nodes.json blockchain/2/static-nodes.json blockchain/3/static-nodes.json < static-nodes.json
+	@tee blockchain/main/static-nodes.json blockchain/2/static-nodes.json blockchain/3/static-nodes.json < static-nodes.json
