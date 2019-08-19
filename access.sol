@@ -4,12 +4,12 @@ contract AccessContract {
 
     struct Manager {
         bytes20 name;
-        bytes20[] devices;
+        bytes17[] devices;
     }
 
     struct Device {
-        bytes20 deviceID; // MAC Address
-        uint16 deviceType;
+        bytes17 deviceID; // MAC Address
+        uint8 deviceType;
         address owner;
         mapping(address => AccessRule) access;
     }
@@ -21,9 +21,9 @@ contract AccessContract {
     }
 
     mapping(address => Manager) managers;
-    mapping(bytes20 => Device) devices;
+    mapping(bytes17 => Device) devices;
 
-    modifier onlyOwner(bytes20 _deviceID) {
+    modifier onlyOwner(bytes17 _deviceID) {
         require(
             devices[_deviceID].owner == msg.sender,
             "Sender not authorized."
@@ -46,12 +46,12 @@ contract AccessContract {
         emit ManagerEvent(_name);
     }
 
-    function getManager() public view returns (address, bytes20, bytes20[] memory) {
+    function getManager() public view returns (address, bytes20, bytes17[] memory) {
         Manager storage manager = managers[msg.sender];
         return (msg.sender, manager.name, manager.devices);
     }
 
-    function addDevice(bytes20 _deviceID, uint16 _deviceType) public {
+    function addDevice(bytes17 _deviceID, uint8 _deviceType) public {
         devices[_deviceID].deviceID = _deviceID;
         devices[_deviceID].deviceType = _deviceType;
         devices[_deviceID].owner = msg.sender;
@@ -59,25 +59,30 @@ contract AccessContract {
         managers[msg.sender].devices.push(_deviceID);
         emit DeviceEvent(1, _deviceID);
     }
-
-    function getDevice(bytes20 _deviceID) public view returns (bytes20, uint, address) {
+    
+    // Return DeviceID, DeviceType & Owner
+    function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address) {
         return (devices[_deviceID].deviceID, devices[_deviceID].deviceType, devices[_deviceID].owner);
     }
 
-    function removeDevice(bytes20 _deviceID) public {
-        require(devices[_deviceID].owner == msg.sender);
+    function deleteDevice(bytes17 _deviceID) public {
+        require(
+            devices[_deviceID].owner == msg.sender,
+            "Sender not authorized."
+        );
         delete(devices[_deviceID]);
     }
 
-    function addAccess(bytes20 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
+    function addRule(bytes17 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
         devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr, _startTime, _endTime);
     }
 
-    function getAccess(bytes20 _deviceID, address _managerAddr) public view returns (bool) {
-        return devices[_deviceID].access[_managerAddr].manager == _managerAddr;
+    function getRule(bytes17 _deviceID) public view returns (bool) {
+        if (devices[_deviceID].owner == msg.sender) return true;
+        return devices[_deviceID].access[msg.sender].manager == msg.sender;
     }
 
-    function removeAccess(bytes20 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
+    function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         delete(devices[_deviceID].access[_managerAddr]);
     }
 }
