@@ -7,9 +7,6 @@ const config = {
     address: "0x7ce63106ddedbd5e430e602052ac02e02c76c3b7"
 }
 
-let rawdata = fs.readFileSync('data.json');
-let data = JSON.parse(rawdata);
-
 const web3 = new Web3(config.url);
 const contract = new web3.eth.Contract(config.abi, config.address);
 var address,result;
@@ -20,13 +17,10 @@ async function main() {
     address = result[0];
     const startTime = new Date();
 
-    data.forEach(macaddr => {
-        let byte = "0x";
-        for (let i = 0; i < macaddr.length; i++) {
-            byte += macaddr.charCodeAt(i)
-        }
-        console.log(byte.length)
-    });
+    let data = [], start = 11, totalData = 5;
+    for(let i = start; i < start+totalData; i++) {
+        data.push('0x00000000000000000000000000000000' + i);
+    }
 
     console.info('Execution time: %dms', (new Date() - startTime))
 }
