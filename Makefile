@@ -22,22 +22,22 @@ delete:
 	@rm -rf ./blockchain
 
 run:
-	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303
+	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 --allow-insecure-unlock --unlock 0 --etherbase 0 console
 
 run-2:
-	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304
+	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 console
 
 run-3:
-	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305
+	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305 console
 
 run-4:
-	@geth --datadir ./blockchain/4 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306
+	@geth --datadir ./blockchain/4 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306 console
 
 run-5:
-	@geth --datadir ./blockchain/5 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307
+	@geth --datadir ./blockchain/5 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307 console
 
 run-6:
-	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308
+	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308 console
 
 attach:
 	@geth attach ./blockchain/main/geth.ipc
