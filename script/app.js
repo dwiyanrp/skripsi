@@ -1,5 +1,4 @@
 const Web3 =  require('web3')
-const fs = require('fs');
 
 const config = {
     url: "http://178.128.98.34:8545",
