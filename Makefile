@@ -76,4 +76,4 @@ accounts-6:
 	@geth --datadir ./blockchain/6 account list
 
 static-nodes:
-	@tee blockchain/main/static-nodes.json blockchain/2/static-nodes.json blockchain/3/static-nodes.json < static-nodes.json
+	@tee blockchain/2/static-nodes.json blockchain/3/static-nodes.json blockchain/4/static-nodes.json blockchain/5/static-nodes.json blockchain/6/static-nodes.json < static-nodes.json
