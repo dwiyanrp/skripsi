@@ -1,5 +1,7 @@
 const Web3 =  require('web3')
 const fastify = require('fastify')()
+const utf8 = require('utf8');
+// const fastify = require('fastify')({ logger: { level: 'info'} })
 
 const config = {
     url: "http://139.59.104.37:8545",
@@ -9,56 +11,63 @@ const config = {
 
 const web3 = new Web3(config.url);
 const contract = new web3.eth.Contract(config.abi, config.address);
-var managerAddress,result;
+var accounts;
 
 // Manager can add new device
 fastify.post('/device', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+
+    console.log()
+    return { user_address: userAddress }
 })
 
 // Manager can remove device
 fastify.delete('/device/:device_id', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+    return { user_address: userAddress }
 })
 
 // Manager can add rule to device
 fastify.post('/device/:device_id', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
-})
-
-// Manager can get devices rules
-fastify.get('/device/:device_id/rules', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+    return { user_address: userAddress }
 })
 
 // Manager can remove rule
 fastify.delete('/device/:device_id/rule/:user_id', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+    return { user_address: userAddress }
+})
+
+// Manager can get devices rules
+fastify.get('/device/:device_id/rules', async (request, reply) => {
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+    return { user_address: userAddress }
 })
 
 // User can check got authorized to access rule or not
 fastify.get('/device/:device_id/rule/:user_id', async (request, reply) => {
-    var user = request.query['user'];
-    var deviceID = request.query['device_id'];
-    return { hello: 'world' }
+    let userAddress = accounts[request.headers.authorization];
+    let deviceID = request.body.device_id;
+    return { user_address: userAddress }
+})
+
+// User can check got authorized to access rule or not
+fastify.post('/sync/accounts', async (request, reply) => {
+    accounts = await web3.eth.getAccounts();
+    return { accounts: accounts }
 })
 
 // Run the server!
 const start = async () => {
-    result = await web3.eth.getAccounts();
-    managerAddress = result[0];
-
+    accounts = await web3.eth.getAccounts();
     try {
+        console.log("server run on 127.0.0.1:8080")
         await fastify.listen(8080)
         fastify.log.info(`server listening on ${fastify.server.address().port}`)
     } catch (err) {
@@ -67,21 +76,3 @@ const start = async () => {
     }
 }
 start()
-
-
-// main();
-
-// async function main() {
-//     result = await web3.eth.getAccounts();
-//     address = result[0];
-//     const startTime = new Date();
-
-//     let data = [], start = 11, totalData = 5;
-//     for(let i = start; i < start+totalData; i++) {
-//         data.push('0x00000000000000000000000000000000' + i);
-//     }
-
-//     console.log(data)
-
-//     console.info('Execution time: %dms', (new Date() - startTime))
-// }

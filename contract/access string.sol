@@ -4,11 +4,11 @@ contract AccessContract {
 
     struct Manager {
         bytes20 name;
-        bytes17[] devices;
+        bytes20[] devices;
     }
 
     struct Device {
-        bytes17 deviceID; // MAC Address
+        bytes20 deviceID; // MAC Address
         uint8 deviceType;
         address owner;
         mapping(address => AccessRule) access;
@@ -21,9 +21,9 @@ contract AccessContract {
     }
 
     mapping(address => Manager) managers;
-    mapping(bytes17 => Device) devices;
+    mapping(bytes20 => Device) devices;
 
-    modifier onlyOwner(bytes17 _deviceID) {
+    modifier onlyOwner(bytes20 _deviceID) {
         require(
             devices[_deviceID].owner == msg.sender,
             "Sender not authorized."
@@ -43,10 +43,10 @@ contract AccessContract {
     function setManager(bytes20 _name) public {
         Manager storage manager = managers[msg.sender];
         manager.name = _name;
-        emit ManagerEvent(_name);
+        emit ManagerEvent(manager.name);
     }
 
-    function getManager() public view returns (address, bytes20, bytes17[] memory) {
+    function getManager() public view returns (address, bytes20, bytes20[] memory) {
         Manager storage manager = managers[msg.sender];
         return (msg.sender, manager.name, manager.devices);
     }
@@ -61,11 +61,11 @@ contract AccessContract {
     }
     
     // Return DeviceID, DeviceType & Owner
-    function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address) {
+    function getDevice(bytes20 _deviceID) public view returns (bytes20, uint8, address) {
         return (devices[_deviceID].deviceID, devices[_deviceID].deviceType, devices[_deviceID].owner);
     }
 
-    function deleteDevice(bytes17 _deviceID) public {
+    function deleteDevice(bytes20 _deviceID) public {
         require(
             devices[_deviceID].owner == msg.sender,
             "Sender not authorized."
@@ -73,16 +73,16 @@ contract AccessContract {
         delete(devices[_deviceID]);
     }
 
-    function addRule(bytes17 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
+    function addRule(bytes20 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
         devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr, _startTime, _endTime);
     }
 
-    function getRule(bytes17 _deviceID) public view returns (bool) {
+    function getRule(bytes20 _deviceID) public view returns (bool) {
         if (devices[_deviceID].owner == msg.sender) return true;
         return devices[_deviceID].access[msg.sender].manager == msg.sender;
     }
 
-    function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
+    function deleteRule(bytes20 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         delete(devices[_deviceID].access[_managerAddr]);
     }
 }
