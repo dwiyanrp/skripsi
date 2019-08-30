@@ -17,8 +17,6 @@ contract AccessContract {
 
     struct AccessRule {
         address manager;
-        uint32 startTime;
-        uint32 endTime;
     }
 
     mapping(address => Manager) managers;
@@ -75,8 +73,8 @@ contract AccessContract {
         delete(devices[_deviceID]);
     }
 
-    function addRule(bytes17 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
-        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr, _startTime, _endTime);
+    function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
+        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
     }
 
     function getRule(bytes17 _deviceID) public view returns (bool) {
