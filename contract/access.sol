@@ -52,6 +52,10 @@ contract AccessContract {
     }
 
     function addDevice(bytes17 _deviceID, uint8 _deviceType) public {
+        if (devices[_deviceID].isExists) {
+            return;
+        }
+    
         devices[_deviceID].deviceID = _deviceID;
         devices[_deviceID].deviceType = _deviceType;
         devices[_deviceID].owner = msg.sender;
@@ -62,7 +66,18 @@ contract AccessContract {
     }
 
     function deleteDevice(bytes17 _deviceID) public onlyOwner(_deviceID) {
+        if (!devices[_deviceID].isExists) {
+            return;
+        }
+
         delete(devices[_deviceID]);
+        uint arrLength = managers[msg.sender].devices.length;
+        for (uint i = 0; i < arrLength; i++){
+            if (managers[msg.sender].devices[i] == _deviceID) {
+                managers[msg.sender].devices[i] = managers[msg.sender].devices[arrLength-1];
+            }
+        }
+        managers[msg.sender].devices.length--;
     }
     
     function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address, bool) {
@@ -76,18 +91,20 @@ contract AccessContract {
 
     function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         delete(devices[_deviceID].access[_managerAddr]);
-        for (uint i = 0; i < devices[_deviceID].listAccess.length; i++) {
+        uint arrLength = devices[_deviceID].listAccess.length;
+        for (uint i = 0; i < arrLength; i++){
             if (devices[_deviceID].listAccess[i] == _managerAddr) {
-                delete devices[_deviceID].listAccess[i];
+                devices[_deviceID].listAccess[i] = devices[_deviceID].listAccess[arrLength-1];
             }
         }
+        devices[_deviceID].listAccess.length--;
     }
     
     function getRules(bytes17 _deviceID) public view returns (address[] memory) {
         return devices[_deviceID].listAccess;
     }
 
-    function getRule(bytes17 _deviceID) public view returns (bool) {
+    function checkAccess(bytes17 _deviceID) public view returns (bool) {
         if (devices[_deviceID].owner == msg.sender) return true;
         return devices[_deviceID].access[msg.sender].manager == msg.sender;
     }
