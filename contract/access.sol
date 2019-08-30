@@ -12,6 +12,7 @@ contract AccessContract {
         uint8 deviceType;
         address owner;
         bool isExists;
+        address[] listAccess;
         mapping(address => AccessRule) access;
     }
 
@@ -70,10 +71,20 @@ contract AccessContract {
 
     function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
+        devices[_deviceID].listAccess.push(_managerAddr);
     }
 
     function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         delete(devices[_deviceID].access[_managerAddr]);
+        for (uint i = 0; i < devices[_deviceID].listAccess.length; i++) {
+            if (devices[_deviceID].listAccess[i] == _managerAddr) {
+                delete devices[_deviceID].listAccess[i];
+            }
+        }
+    }
+    
+    function getRules(bytes17 _deviceID) public view returns (address[] memory) {
+        return devices[_deviceID].listAccess;
     }
 
     function getRule(bytes17 _deviceID) public view returns (bool) {

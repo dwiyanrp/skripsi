@@ -4,17 +4,30 @@ const fastify = require('fastify')()
 
 const config = {
     url: "http://139.59.104.37:8545",
-    abi: [ { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_deviceType", "type": "uint8" } ], "name": "addDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" }, { "name": "_startTime", "type": "uint32" }, { "name": "_endTime", "type": "uint32" } ], "name": "addRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "deleteDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" } ], "name": "deleteRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_name", "type": "bytes32" } ], "name": "setManager", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "name", "type": "bytes32" } ], "name": "ManagerEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "typeEvent", "type": "int8" }, { "indexed": false, "name": "deviceID", "type": "bytes17" } ], "name": "DeviceEvent", "type": "event" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getDevice", "outputs": [ { "name": "", "type": "bytes17" }, { "name": "", "type": "uint8" }, { "name": "", "type": "address" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getManager", "outputs": [ { "name": "", "type": "address" }, { "name": "", "type": "bytes32" }, { "name": "", "type": "bytes17[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getRule", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" } ],
-    address: "0xdf6a93bb1e88c5e792ace980e9c501f86a8c4da0"
+    abi: [ { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_deviceType", "type": "uint8" } ], "name": "addDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" } ], "name": "addRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "deleteDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" } ], "name": "deleteRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_name", "type": "bytes32" } ], "name": "editManager", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "name", "type": "bytes32" } ], "name": "ManagerEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "typeEvent", "type": "int8" }, { "indexed": false, "name": "deviceID", "type": "bytes17" } ], "name": "DeviceEvent", "type": "event" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getDevice", "outputs": [ { "name": "", "type": "bytes17" }, { "name": "", "type": "uint8" }, { "name": "", "type": "address" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getManager", "outputs": [ { "name": "", "type": "address" }, { "name": "", "type": "bytes32" }, { "name": "", "type": "bytes17[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getRule", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getRules", "outputs": [ { "name": "", "type": "address[]" } ], "payable": false, "stateMutability": "view", "type": "function" } ],
+    address: "0xb6c07d9e26e6e31276a5e5e8cb7a6cb11a72702d"
 }
 
 const web3 = new Web3(config.url);
 const contract = new web3.eth.Contract(config.abi, config.address);
 var accounts;
 
-fastify.get('/mymanager', async (request, reply) => {
+fastify.put('/manager', async (request, reply) => {
+    let userAddress = accounts[request.headers.authorization];
+    let name = request.body.name;
+    let hexName = web3.utils.utf8ToHex(name);
+
     let response,responseError;
-    await contract.methods.getManager().call().then((result) => {
+    await contract.methods.editManager(hexName).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+
+    return {data: response}
+})
+
+fastify.get('/mymanager', async (request, reply) => {
+    let userAddress = accounts[request.headers.authorization];
+
+    let response,responseError;
+    await contract.methods.getManager().call({from: userAddress}).then((result) => {
         response = {
             manager : {
                 address: result["0"],
@@ -31,17 +44,6 @@ fastify.get('/mymanager', async (request, reply) => {
     return {data : response}
 })
 
-fastify.put('/manager', async (request, reply) => {
-    let userAddress = accounts[request.headers.authorization];
-    let name = request.body.name;
-    let hexName = web3.utils.utf8ToHex(name);
-
-    let response,responseError;
-    await contract.methods.setManager(hexName).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
-
-    return {data: response}
-})
-
 // Manager can add new device
 fastify.post('/device', async (request, reply) => {
     let userAddress = accounts[request.headers.authorization];
@@ -51,17 +53,17 @@ fastify.post('/device', async (request, reply) => {
     let response,responseError;
     await contract.methods.addDevice(macAddress, deviceType).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
 
-    return {result: response}
+    return {data: response}
 })
 
 // Manager can remove device
 fastify.delete('/device/:device_id', async (request, reply) => {
     let userAddress = accounts[request.headers.authorization];
     let deviceID = request.body.device_id;
-    return {user_address: userAddress}
+    return {data: userAddress}
 })
 
-// Everyone can get device data
+// Everyone can get device info
 fastify.get('/device', async (request, reply) => {
     let macAddress = web3.utils.utf8ToHex(request.query.device_id);
 
@@ -84,30 +86,41 @@ fastify.get('/device', async (request, reply) => {
 })
 
 // Manager can add rule to device
-fastify.post('/device/:device_id', async (request, reply) => {
-    let response,responseError;
-
+fastify.post('/rule', async (request, reply) => {
     let userAddress = accounts[request.headers.authorization];
-    let deviceID = request.body.device_id;
-    return { user_address: userAddress }
+    let macAddress = web3.utils.utf8ToHex(request.body.device_id);
+    let grantUser = request.body.user_address;
+
+    let response,responseError;
+    await contract.methods.addRule(macAddress, grantUser).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+
+    return {data: response}
 })
 
-// Manager can remove rule
-fastify.delete('/device/:device_id/rule/:user_id', async (request, reply) => {
-    let response,responseError;
-
+// Manager can delete rule
+fastify.delete('/rule', async (request, reply) => {
     let userAddress = accounts[request.headers.authorization];
-    let deviceID = request.body.device_id;
-    return { user_address: userAddress }
+    let macAddress = web3.utils.utf8ToHex(request.body.device_id);
+    let grantUser = request.body.user_address;
+
+    let response,responseError;
+    await contract.methods.deleteRule(macAddress, grantUser).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+
+    return {data: response}
 })
 
-// Manager can get devices rules
-fastify.get('/device/:device_id/rules', async (request, reply) => {
-    let response,responseError;
+// Manager can get device rules
+fastify.get('/rules', async (request, reply) => {
+    let macAddress = web3.utils.utf8ToHex(request.query.device_id);
 
-    let userAddress = accounts[request.headers.authorization];
-    let deviceID = request.body.device_id;
-    return { user_address: userAddress }
+    let response,responseError;
+    await contract.methods.getRules(macAddress).call().then((result) => {
+        response = {
+            device_rules: result
+        }
+    })
+
+    return {data: response, error: responseError}
 })
 
 // User can check got authorized to access rule or not
