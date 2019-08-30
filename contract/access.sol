@@ -39,7 +39,7 @@ contract AccessContract {
         bytes17 deviceID
     );
 
-    function setManager(bytes32 _name) public {
+    function editManager(bytes32 _name) public {
         Manager storage manager = managers[msg.sender];
         manager.name = _name;
         emit ManagerEvent(manager.name);
@@ -59,30 +59,25 @@ contract AccessContract {
         managers[msg.sender].devices.push(_deviceID);
         emit DeviceEvent(1, _deviceID);
     }
+
+    function deleteDevice(bytes17 _deviceID) public onlyOwner(_deviceID) {
+        delete(devices[_deviceID]);
+    }
     
-    // Return DeviceID, DeviceType & Owner
     function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address, bool) {
         return (devices[_deviceID].deviceID, devices[_deviceID].deviceType, devices[_deviceID].owner, devices[_deviceID].isExists);
-    }
-
-    function deleteDevice(bytes17 _deviceID) public {
-        require(
-            devices[_deviceID].owner == msg.sender,
-            "Sender not authorized."
-        );
-        delete(devices[_deviceID]);
     }
 
     function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
         devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
     }
 
+    function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
+        delete(devices[_deviceID].access[_managerAddr]);
+    }
+
     function getRule(bytes17 _deviceID) public view returns (bool) {
         if (devices[_deviceID].owner == msg.sender) return true;
         return devices[_deviceID].access[msg.sender].manager == msg.sender;
-    }
-
-    function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
-        delete(devices[_deviceID].access[_managerAddr]);
     }
 }
