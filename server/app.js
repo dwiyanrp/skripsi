@@ -31,7 +31,7 @@ fastify.get('/mymanager', async (request, reply) => {
     return {data : response}
 })
 
-fastify.post('/manager', async (request, reply) => {
+fastify.put('/manager', async (request, reply) => {
     let userAddress = accounts[request.headers.authorization];
     let name = request.body.name;
     let hexName = web3.utils.utf8ToHex(name);
