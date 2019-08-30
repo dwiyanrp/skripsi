@@ -51,7 +51,7 @@ contract AccessContract {
         return (msg.sender, manager.name, manager.devices);
     }
 
-    function addDevice(bytes17 _deviceID, uint8 _deviceType) public {
+    function addDevice(bytes20 _deviceID, uint8 _deviceType) public {
         devices[_deviceID].deviceID = _deviceID;
         devices[_deviceID].deviceType = _deviceType;
         devices[_deviceID].owner = msg.sender;
