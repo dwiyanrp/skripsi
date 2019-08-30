@@ -39,22 +39,22 @@ run-5:
 run-6:
 	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308
 
-attach:
+a:
 	@geth attach ./blockchain/main/geth.ipc
 
-attach-2:
+a2:
 	@geth attach ./blockchain/2/geth.ipc
 
-attach-3:
+a3:
 	@geth attach ./blockchain/3/geth.ipc
 
-attach-4:
+a4:
 	@geth attach ./blockchain/4/geth.ipc
 
-attach-5:
+a5:
 	@geth attach ./blockchain/5/geth.ipc
 
-attach-6:
+a6:
 	@geth attach ./blockchain/6/geth.ipc
 
 accounts:
