@@ -3,7 +3,7 @@ pragma solidity ^0.5.1;
 contract AccessContract {
 
     struct Manager {
-        bytes20 name;
+        string name;
         bytes20[] devices;
     }
 
@@ -16,8 +16,6 @@ contract AccessContract {
 
     struct AccessRule {
         address manager;
-        uint32 startTime;
-        uint32 endTime;
     }
 
     mapping(address => Manager) managers;
@@ -32,7 +30,7 @@ contract AccessContract {
     }
 
     event ManagerEvent(
-        bytes20 name
+        string name
     );
 
     event DeviceEvent(
@@ -40,13 +38,13 @@ contract AccessContract {
         bytes20 deviceID
     );
 
-    function setManager(bytes20 _name) public {
+    function setManager(string memory _name) public {
         Manager storage manager = managers[msg.sender];
         manager.name = _name;
         emit ManagerEvent(manager.name);
     }
 
-    function getManager() public view returns (address, bytes20, bytes20[] memory) {
+    function getManager() public view returns (address, string memory, bytes20[] memory) {
         Manager storage manager = managers[msg.sender];
         return (msg.sender, manager.name, manager.devices);
     }
@@ -73,8 +71,8 @@ contract AccessContract {
         delete(devices[_deviceID]);
     }
 
-    function addRule(bytes20 _deviceID, address _managerAddr, uint32 _startTime, uint32 _endTime) public onlyOwner(_deviceID) {
-        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr, _startTime, _endTime);
+    function addRule(bytes20 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
+        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
     }
 
     function getRule(bytes20 _deviceID) public view returns (bool) {
