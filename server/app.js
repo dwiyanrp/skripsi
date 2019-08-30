@@ -126,6 +126,8 @@ fastify.post('/sync/accounts', async (request, reply) => {
 // Run the server!
 const start = async () => {
     accounts = await web3.eth.getAccounts();
+    setInterval(async function(){ accounts = await web3.eth.getAccounts() }, 5000);
+
     try {
         console.log("server run on 127.0.0.1:8080")
         await fastify.listen(8080)
