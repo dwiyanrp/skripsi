@@ -94,21 +94,11 @@ contract AccessContract {
     }
 
     function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
-        require(
-            devices[_deviceID].isExists,
-            "Device not exists."
-        );
-
         devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
         devices[_deviceID].listAccess.push(_managerAddr);
     }
 
     function deleteRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
-        require(
-            devices[_deviceID].isExists,
-            "Device not exists."
-        );
-
         delete(devices[_deviceID].access[_managerAddr]);
         uint arrLength = devices[_deviceID].listAccess.length;
         for (uint i = 0; i < arrLength; i++){
