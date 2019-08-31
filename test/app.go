@@ -124,8 +124,8 @@ func Run_AddRule() {
 			fmt.Println(err)
 		} else {
 			if DEBUG {
-				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Print(string(body))
+				// body, _ := ioutil.ReadAll(resp.Body)
+				// fmt.Print(string(body))
 			}
 		}
 		resp.Body.Close()
