@@ -18,6 +18,7 @@ contract AccessContract {
 
     struct AccessRule {
         address manager;
+        bool isExists;
     }
 
     mapping(address => Manager) managers;
@@ -94,7 +95,12 @@ contract AccessContract {
     }
 
     function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
-        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr);
+        require(
+            !devices[_deviceID].access[_managerAddr].isExists,
+            "Rule already exists"
+        );
+    
+        devices[_deviceID].access[_managerAddr] = AccessRule(_managerAddr, true);
         devices[_deviceID].listAccess.push(_managerAddr);
     }
 
