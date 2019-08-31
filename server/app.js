@@ -86,13 +86,7 @@ fastify.delete('/device', async (request, reply) => {
     }
 
     let response,responseError;
-    await contract.methods.deleteDevice(macAddress).send({from: userAddress, gas: 3000000})
-    .on('receipt', function(receipt) {
-        response = receipt;
-    })
-    .on('error', function(err) {
-        console.log(err)
-    })
+    await contract.methods.deleteDevice(macAddress).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
 
     return {data: response}
 })
@@ -111,7 +105,7 @@ fastify.get('/device', async (request, reply) => {
                     device_id: web3.utils.hexToUtf8(result["0"]),
                     device_type: result["1"],
                     owner_address: result["2"],
-                    // device_rules: result["4"]
+                    device_rules: result["4"]
                 }
             }
         }
