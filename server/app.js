@@ -1,5 +1,6 @@
 const Web3 =  require('web3')
 const fastify = require('fastify')()
+fastify.register(require('fastify-formbody'))
 // const fastify = require('fastify')({ logger: { level: 'info'} })
 
 const config = {
