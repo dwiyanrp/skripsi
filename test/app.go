@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +15,7 @@ import (
 
 var (
 	client          = &http.Client{}
-	MANAGER_ADDRESS = "0xF34C1594f5E353b5658993bf71EB0aB3b1938094"
+	MANAGER_ADDRESS = "0xB8023550640e3070354867D9ADd0AD945595262B"
 	req_AddDevice   = make([]*ADD_DEVICE, 0)
 	req_AddRule     = make([]*ADD_RULE, 0)
 	DEBUG           = true
@@ -36,8 +37,8 @@ func main() {
 	Init_AddDevice()
 	Run_AddDevice()
 
-	Init_AddRule()
-	Run_AddRule()
+	// Init_AddRule()
+	// Run_AddRule()
 }
 
 func Init_AddDevice() {
@@ -99,14 +100,17 @@ func Init_AddRule() {
 func Run_AddDevice() {
 	start := time.Now()
 	for _, ad := range req_AddDevice {
+		fmt.Println(ad.DeviceID)
 		resp, err := client.Do(ad.Req)
 		if err != nil {
 			fmt.Println(err)
 		} else {
 			if DEBUG {
-				fmt.Println(ad.DeviceID, resp)
+				body, _ := ioutil.ReadAll(resp.Body)
+				fmt.Println(string(body))
 			}
 		}
+		resp.Body.Close()
 	}
 	fmt.Println(time.Now().Sub(start))
 }
@@ -114,14 +118,17 @@ func Run_AddDevice() {
 func Run_AddRule() {
 	start := time.Now()
 	for _, ar := range req_AddRule {
+		fmt.Print(ar.DeviceID, ar.GrantUser)
 		resp, err := client.Do(ar.Req)
 		if err != nil {
 			fmt.Println(err)
 		} else {
 			if DEBUG {
-				fmt.Println(ar.DeviceID, ar.GrantUser, resp)
+				body, _ := ioutil.ReadAll(resp.Body)
+				fmt.Print(string(body))
 			}
 		}
+		resp.Body.Close()
 	}
 	fmt.Println(time.Now().Sub(start))
 }
