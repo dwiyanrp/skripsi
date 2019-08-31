@@ -6,7 +6,8 @@ fastify.register(require('fastify-formbody'))
 const config = {
     url: "http://139.59.104.37:8545",
     abi: [ { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "deleteDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_name", "type": "bytes32" } ], "name": "editManager", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" } ], "name": "deleteRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "getDevice", "outputs": [ { "name": "", "type": "bytes17" }, { "name": "", "type": "uint8" }, { "name": "", "type": "address" }, { "name": "", "type": "bool" }, { "name": "", "type": "address[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_managerAddr", "type": "address" } ], "name": "addRule", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "_deviceID", "type": "bytes17" } ], "name": "checkAccess", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getManager", "outputs": [ { "name": "", "type": "address" }, { "name": "", "type": "bytes32" }, { "name": "", "type": "bytes17[]" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "_deviceID", "type": "bytes17" }, { "name": "_deviceType", "type": "uint8" } ], "name": "addDevice", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "name", "type": "bytes32" } ], "name": "ManagerEvent", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "typeEvent", "type": "int8" }, { "indexed": false, "name": "deviceID", "type": "bytes17" } ], "name": "DeviceEvent", "type": "event" } ],
-    address: "0x55d4071c85705532050892f2e0f9f2d31224a302"
+    address: "0x55d4071c85705532050892f2e0f9f2d31224a302",
+    gas: 6000000
 }
 
 const web3 = new Web3(config.url);
@@ -24,7 +25,7 @@ fastify.put('/manager', async (request, reply) => {
     let hexName = web3.utils.utf8ToHex(name);
 
     let response,responseError;
-    await contract.methods.editManager(hexName).send({from: userAddress, gas: 3000000}).then((result) => {
+    await contract.methods.editManager(hexName).send({from: userAddress, gas: config.gas}).then((result) => {
         response = result;
     })
 
@@ -72,7 +73,7 @@ fastify.post('/device', async (request, reply) => {
     }
 
     let response,responseError;
-    await contract.methods.addDevice(macAddress, deviceType).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+    await contract.methods.addDevice(macAddress, deviceType).send({from: userAddress, gas: config.gas}).then((result) => {response = result})
 
     return {data: response}
 })
@@ -93,7 +94,7 @@ fastify.delete('/device', async (request, reply) => {
     }
 
     let response,responseError;
-    await contract.methods.deleteDevice(macAddress).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+    await contract.methods.deleteDevice(macAddress).send({from: userAddress, gas: config.gas}).then((result) => {response = result})
 
     return {data: response}
 })
@@ -141,9 +142,15 @@ fastify.post('/rule', async (request, reply) => {
         reply.code(400).send({error: "Device not exists"})
     }
 
+    let isRuleExists = false;
+    await contract.methods.checkAccess(macAddress).call({from: grantUser}).then((result) => {isRuleExists = result})
+    if (isRuleExists) {
+        reply.code(400).send({error: "Rule already exists"})
+    }
+
 
     let response,responseError;
-    await contract.methods.addRule(macAddress, grantUser).send({from: userAddress, gas: 3000000})
+    await contract.methods.addRule(macAddress, grantUser).send({from: userAddress, gas: config.gas})
     .on('receipt', function(receipt) {
         response = receipt;
     })
@@ -171,7 +178,7 @@ fastify.delete('/rule', async (request, reply) => {
     }
 
     let response,responseError;
-    await contract.methods.deleteRule(macAddress, grantUser).send({from: userAddress, gas: 3000000}).then((result) => {response = result})
+    await contract.methods.deleteRule(macAddress, grantUser).send({from: userAddress, gas: config.gas}).then((result) => {response = result})
 
     return {data: response}
 })
