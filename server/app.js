@@ -81,6 +81,13 @@ fastify.delete('/device', async (request, reply) => {
     }
 
     let macAddress = web3.utils.utf8ToHex(request.query.device_id);
+
+    let isDeviceExists = false;
+    await contract.methods.getDevice(macAddress).call().then((result) => {isDeviceExists=result["3"]})
+    if (!isDeviceExists) {
+        return {error: "Device not exists"}
+    }
+
     await contract.methods.deleteDevice(macAddress).send({from: userAddress, gas: 3000000})
     .on('receipt', function(receipt) {
         response = receipt;
@@ -89,14 +96,13 @@ fastify.delete('/device', async (request, reply) => {
         console.log(err)
     })
 
-    return {data: userAddress}
+    return {data: response}
 })
 
 // Everyone can get device info
 fastify.get('/device', async (request, reply) => {
     let macAddress = web3.utils.utf8ToHex(request.query.device_id);
 
-    let response,responseError;
     await contract.methods.getDevice(macAddress).call().then((result) => {
         if (!result["3"]) { // check is device exists
             responseError = "Device not exists"
@@ -112,7 +118,7 @@ fastify.get('/device', async (request, reply) => {
         }
     })
 
-    return {data: response, error: responseError}
+    return {data: response}
 })
 
 // Manager can add rule to device
