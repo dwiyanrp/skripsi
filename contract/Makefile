@@ -22,22 +22,22 @@ delete:
 	@rm -rf ./blockchain
 
 run:
-	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 --allow-insecure-unlock --unlock 0 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/main --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 --allow-insecure-unlock --unlock 0 --mine --minerthreads 1
 
 run-2:
-	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/2 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 --mine --minerthreads 1
 
 run-3:
-	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/3 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305 --mine --minerthreads 1
 
 run-4:
-	@geth --datadir ./blockchain/4 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/4 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306 --mine --minerthreads 1
 
 run-5:
-	@geth --datadir ./blockchain/5 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/5 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307 --mine --minerthreads 1
 
 run-6:
-	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308 --bootnodes "enode://ae573bb33a8d6166f6efe5d8faa4f28fffccc14810390983d0a4fa3ba89292e85789d4b2e599f1be9c44dc28b8778adcbbf4b2280294c3b674326fe2c73c350a@127.0.0.1:30303" --mine --minerthreads 1
+	@geth --datadir ./blockchain/6 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308 --mine --minerthreads 1
 
 a:
 	@geth attach ./blockchain/main/geth.ipc
