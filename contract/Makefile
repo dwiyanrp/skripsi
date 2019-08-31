@@ -22,22 +22,21 @@ delete:
 	@rm -rf ./blockchain
 
 run:
-	@geth --datadir ./blockchain/main --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,debug,eth,ethash,miner,net,personal,rpc,txpool,web3 --allow-insecure-unlock
-
+	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,eth,miner,net,personal,rpc,web3 --allow-insecure-unlock --unlock 0
 run-2:
-	@geth --datadir ./blockchain/2 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 --mine --minerthreads 1
+	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 --mine --minerthreads 1
 
 run-3:
-	@geth --datadir ./blockchain/3 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305 --mine --minerthreads 1
+	@geth --datadir ./blockchain/3 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8547 --port 30305 --mine --minerthreads 1
 
 run-4:
-	@geth --datadir ./blockchain/4 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306 --mine --minerthreads 1
+	@geth --datadir ./blockchain/4 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8548 --port 30306 --mine --minerthreads 1
 
 run-5:
-	@geth --datadir ./blockchain/5 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307 --mine --minerthreads 1
+	@geth --datadir ./blockchain/5 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8549 --port 30307 --mine --minerthreads 1
 
 run-6:
-	@geth --datadir ./blockchain/6 --networkid 100 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308 --mine --minerthreads 1
+	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308 --mine --minerthreads 1
 
 a:
 	@geth attach ./blockchain/main/geth.ipc
