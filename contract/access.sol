@@ -52,9 +52,10 @@ contract AccessContract {
     }
 
     function addDevice(bytes17 _deviceID, uint8 _deviceType) public {
-        if (devices[_deviceID].isExists) {
-            return;
-        }
+        require(
+            !devices[_deviceID].isExists,
+            "Device already exists."
+        );
     
         devices[_deviceID].deviceID = _deviceID;
         devices[_deviceID].deviceType = _deviceType;
@@ -66,13 +67,20 @@ contract AccessContract {
     }
 
     function deleteDevice(bytes17 _deviceID) public onlyOwner(_deviceID) {
-        if (!devices[_deviceID].isExists) {
-            return;
+        require(
+            devices[_deviceID].isExists,
+            "Device not exists."
+        );
+
+        uint arrLength = devices[_deviceID].listAccess.length;
+        for (uint i = 0; i < arrLength; i++) {
+            address addr = devices[_deviceID].listAccess[i];
+            delete(devices[_deviceID].access[addr]);
         }
 
         delete(devices[_deviceID]);
-        uint arrLength = managers[msg.sender].devices.length;
-        for (uint i = 0; i < arrLength; i++){
+        arrLength = managers[msg.sender].devices.length;
+        for (uint i = 0; i < arrLength; i++) {
             if (managers[msg.sender].devices[i] == _deviceID) {
                 managers[msg.sender].devices[i] = managers[msg.sender].devices[arrLength-1];
             }
@@ -80,8 +88,9 @@ contract AccessContract {
         managers[msg.sender].devices.length--;
     }
     
-    function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address, bool) {
-        return (devices[_deviceID].deviceID, devices[_deviceID].deviceType, devices[_deviceID].owner, devices[_deviceID].isExists);
+    function getDevice(bytes17 _deviceID) public view returns (bytes17, uint8, address, bool, address[] memory) {
+        return (devices[_deviceID].deviceID, devices[_deviceID].deviceType, devices[_deviceID].owner,
+            devices[_deviceID].isExists, devices[_deviceID].listAccess);
     }
 
     function addRule(bytes17 _deviceID, address _managerAddr) public onlyOwner(_deviceID) {
@@ -98,10 +107,6 @@ contract AccessContract {
             }
         }
         devices[_deviceID].listAccess.length--;
-    }
-    
-    function getRules(bytes17 _deviceID) public view returns (address[] memory) {
-        return devices[_deviceID].listAccess;
     }
 
     function checkAccess(bytes17 _deviceID) public view returns (bool) {
