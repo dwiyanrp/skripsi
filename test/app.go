@@ -12,14 +12,18 @@ import (
 	"time"
 )
 
+var (
+	client          = &http.Client{}
+	MANAGER_ADDRESS = "0xF34C1594f5E353b5658993bf71EB0aB3b1938094"
+	req_AddDevice   = make([]*ADD_DEVICE, 0)
+	req_AddRule     = make([]*ADD_RULE, 0)
+	DEBUG           = true
+)
+
 type ADD_DEVICE struct {
 	DeviceID   string
 	DeviceType string
 	Req        *http.Request
-}
-
-func (ad *ADD_DEVICE) PrintSuccess() {
-	fmt.Println(ad.DeviceID + " | " + ad.DeviceType + " | success added")
 }
 
 type ADD_RULE struct {
@@ -27,18 +31,6 @@ type ADD_RULE struct {
 	GrantUser string
 	Req       *http.Request
 }
-
-func (ar *ADD_RULE) PrintSuccess() {
-	fmt.Println(ar.DeviceID + " | " + ar.GrantUser + " | success added")
-}
-
-var (
-	client          = &http.Client{}
-	MANAGER_ADDRESS = "0xCfD53011913d3b43559E989677923189265bDb1e"
-	req_AddDevice   = make([]*ADD_DEVICE, 0)
-	req_AddRule     = make([]*ADD_RULE, 0)
-	DEBUG           = true
-)
 
 func main() {
 	Init_AddDevice()
@@ -107,12 +99,12 @@ func Init_AddRule() {
 func Run_AddDevice() {
 	start := time.Now()
 	for _, ad := range req_AddDevice {
-		_, err := client.Do(ad.Req)
+		resp, err := client.Do(ad.Req)
 		if err != nil {
 			fmt.Println(err)
 		} else {
 			if DEBUG {
-				ad.PrintSuccess()
+				fmt.Println(ad.DeviceID, resp)
 			}
 		}
 	}
@@ -122,12 +114,12 @@ func Run_AddDevice() {
 func Run_AddRule() {
 	start := time.Now()
 	for _, ar := range req_AddRule {
-		_, err := client.Do(ar.Req)
+		resp, err := client.Do(ar.Req)
 		if err != nil {
 			fmt.Println(err)
 		} else {
 			if DEBUG {
-				ar.PrintSuccess()
+				fmt.Println(ar.DeviceID, ar.GrantUser, resp)
 			}
 		}
 	}
