@@ -155,7 +155,7 @@ fastify.delete('/rule', async (request, reply) => {
     let grantUser = request.body.user_address;
 
     let isRuleExists = false;
-    await contract.methods.checkAccess(macAddress).call({from: grantUser}).then((result) => {isRuleExists = result; console.log(result)})
+    await contract.methods.checkAccess(macAddress).call({from: grantUser}).then((result) => {isRuleExists = result})
     if (!isRuleExists) {
         reply.code(400).send({error: "Rule not exists"})
     }
