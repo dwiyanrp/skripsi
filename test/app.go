@@ -34,15 +34,27 @@ type ADD_RULE struct {
 }
 
 func main() {
-	Init_AddDevice()
+	log.Println("Running experiment 1")
+	Init_AddDevice("add_device.csv")
 	Run_AddDevice()
+	Init_AddRule("add_rule.csv")
+	Run_AddRule()
 
-	Init_AddRule()
+	log.Println("Running experiment 2")
+	Init_AddDevice("add_device2.csv")
+	Run_AddDevice()
+	Init_AddRule("add_rule2.csv")
+	Run_AddRule()
+
+	log.Println("Running experiment 3")
+	Init_AddDevice("add_device3.csv")
+	Run_AddDevice()
+	Init_AddRule("add_rule3.csv")
 	Run_AddRule()
 }
 
-func Init_AddDevice() {
-	csvfile, err := os.Open("add_device.csv")
+func Init_AddDevice(filename string) {
+	csvfile, err := os.Open(filename)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
@@ -69,8 +81,8 @@ func Init_AddDevice() {
 	}
 }
 
-func Init_AddRule() {
-	csvfile, err := os.Open("add_rule.csv")
+func Init_AddRule(filename string) {
+	csvfile, err := os.Open(filename)
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
