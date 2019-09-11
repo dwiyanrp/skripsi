@@ -15,7 +15,7 @@ import (
 
 var (
 	client          = &http.Client{}
-	MANAGER_ADDRESS = "0xE67B7CDABf1B61009Ac7B34Bb028B321CE26014b"
+	MANAGER_ADDRESS = "0x8685bb0e4756e31877acc6555c53cd38973a3123"
 	req_AddDevice   = make([]*ADD_DEVICE, 0)
 	req_AddRule     = make([]*ADD_RULE, 0)
 	DEBUG           = true
