@@ -24,9 +24,10 @@ cd contract
 make init ( will create 6 blockchain )
 make run ( will run main blockchain, rpc port 8545 & port 30303 ( default ))
 ```
-6. Open [Remix - Ethereum IDE](http://remix.ethereum.org/#optimize=false&evmVersion=null&version=soljson-v0.5.11+commit.c082d0b4.js) for edit, compile & deploy contract (make use http, not https)
+6. Open [Remix - Ethereum IDE](http://remix.ethereum.org/#optimize=true&evmVersion=null&version=soljson-v0.5.1+commit.c8a2cb62.js) for edit, compile & deploy contract (make use http, not https)
     - Go to Plugin Manager and install **Solidity Compiler** & **Deploy & Run Transactions**
-    - Enable auto compile on **Solidity Compiler** ( for ease deploy contract )
+    - Set compiler to v0.5.1+commit.c8a2cb62
+    - Enable auto compile on **Solidity Compiler** & enable optimization ( for ease deploy contract )
     - Create new file access.sol
     - Open access.sol on this git ( skripsi/contract/access.sol )
     - Change environment to **Web 3 Provider**, set url to server url.
