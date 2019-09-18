@@ -1,10 +1,10 @@
 # How to run blockchain on Server :
 1. Create server ( OS Ubuntu 18.04.3 LTS, Minimum 2GB RAM ) if less than 2GB RAM, miner sometimes not run
-2. Run command update, upgrade & install build-essentials
+2. Run command update, upgrade & install build-essential
 ```
 sudo apt update
 sudo apt upgrade
-sudo apt install build-essentials
+sudo apt install build-essential
 ```
 3. Install [geth](https://geth.ethereum.org/downloads/) ( Version 1.9.2 )
 ```
