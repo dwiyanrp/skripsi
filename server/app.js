@@ -1,5 +1,5 @@
 const Web3 =  require('web3')
-const fastify = require('fastify')({ logger: { level: 'info' }})
+const fastify = require('fastify')()
 fastify.register(require('fastify-formbody'))
 // const fastify = require('fastify')({ logger: { level: 'info'} })
 
@@ -217,7 +217,7 @@ const start = async () => {
 
     try {
         await fastify.listen(8080, "0.0.0.0")
-        fastify.log.info(`server listening on ${fastify.server.address().port}`)
+        console.log(`server listening on ${fastify.server.address().address}:${fastify.server.address().port}`)
     } catch (err) {
         fastify.log.error(err)
         process.exit(1)
