@@ -40,7 +40,7 @@ run-6:
 	@geth --datadir ./blockchain/6 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8550 --port 30308
 
 miner:
-	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,eth,miner,net,personal,rpc,web3 --allow-insecure-unlock --unlock 0 --mine --minerthreads 1
+	@geth --datadir ./blockchain/main --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8545 --port 30303 --rpcaddr "0.0.0.0" --rpcapi admin,eth,miner,net,personal,rpc,web3 --allow-insecure-unlock --mine --minerthreads 1
 
 miner-2:
 	@geth --datadir ./blockchain/2 --networkid 15 --rpc --rpccorsdomain "*" --rpcport 8546 --port 30304 --mine --minerthreads 1
