@@ -19,6 +19,7 @@ var (
 	MANAGER_ADDRESS = "0x426ebb5de6b143ee65349a42f79dca970e102adc"
 	req_AddDevice   = make([]*ADD_DEVICE, 0)
 	req_AddRule     = make([]*ADD_RULE, 0)
+	req_CheckRule   = make([]*CHECK_RULE, 0)
 	DEBUG           = true
 )
 
@@ -34,24 +35,36 @@ type ADD_RULE struct {
 	Req       *http.Request
 }
 
+type CHECK_RULE struct {
+	DeviceID string
+	AuthUser string
+	Req      *http.Request
+}
+
 func main() {
 	log.Println("Running experiment 1")
-	Init_AddDevice("add_device.csv")
-	Run_AddDevice()
-	Init_AddRule("add_rule.csv")
-	Run_AddRule()
+	// Init_AddDevice("add_device.csv")
+	// Run_AddDevice()
+	// Init_AddRule("add_rule.csv")
+	// Run_AddRule()
+	Init_CheckRule("add_rule.csv")
+	Run_CheckRule()
 
 	log.Println("Running experiment 2")
-	Init_AddDevice("add_device2.csv")
-	Run_AddDevice()
-	Init_AddRule("add_rule2.csv")
-	Run_AddRule()
+	// Init_AddDevice("add_device2.csv")
+	// Run_AddDevice()
+	// Init_AddRule("add_rule2.csv")
+	// Run_AddRule()
+	Init_CheckRule("add_rule2.csv")
+	Run_CheckRule()
 
 	log.Println("Running experiment 3")
-	Init_AddDevice("add_device3.csv")
-	Run_AddDevice()
-	Init_AddRule("add_rule3.csv")
-	Run_AddRule()
+	// Init_AddDevice("add_device3.csv")
+	// Run_AddDevice()
+	// Init_AddRule("add_rule3.csv")
+	// Run_AddRule()
+	Init_CheckRule("add_rule3.csv")
+	Run_CheckRule()
 }
 
 func Init_AddDevice(filename string) {
@@ -137,6 +150,53 @@ func Run_AddRule() {
 	for _, ar := range req_AddRule {
 		fmt.Println(ar.DeviceID, ar.GrantUser)
 		resp, err := client.Do(ar.Req)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			body, _ := ioutil.ReadAll(resp.Body)
+			if resp.StatusCode != 200 {
+				fmt.Println(string(body))
+			} else if DEBUG {
+				// fmt.Println(string(body))
+			}
+		}
+		resp.Body.Close()
+	}
+	fmt.Println(time.Now().Sub(start))
+}
+
+func Init_CheckRule(filename string) {
+	csvfile, err := os.Open(filename)
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	req_CheckRule = make([]*CHECK_RULE, 0)
+	r := csv.NewReader(csvfile)
+	isFirst := true
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			log.Fatal(err)
+		} else if isFirst {
+			isFirst = false
+			continue
+		}
+
+		req, err := http.NewRequest("GET", HOST+"/rule?device_id="+record[0], nil)
+		req.Header.Set("Authorization", record[1])
+
+		req_CheckRule = append(req_CheckRule, &CHECK_RULE{record[0], record[1], req})
+	}
+}
+
+func Run_CheckRule() {
+	start := time.Now()
+	for _, cr := range req_CheckRule {
+		fmt.Println(cr.DeviceID, cr.AuthUser)
+		resp, err := client.Do(cr.Req)
 		if err != nil {
 			fmt.Println(err)
 		} else {
