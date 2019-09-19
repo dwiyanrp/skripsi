@@ -14,13 +14,16 @@ import (
 )
 
 var (
-	client          = &http.Client{}
-	HOST            = "http://165.22.98.110:8080"
+	client = &http.Client{}
+	HOST   = "http://165.22.98.110:8080"
+
 	MANAGER_ADDRESS = "0x426ebb5de6b143ee65349a42f79dca970e102adc"
-	req_AddDevice   = make([]*ADD_DEVICE, 0)
-	req_AddRule     = make([]*ADD_RULE, 0)
-	req_CheckRule   = make([]*CHECK_RULE, 0)
-	DEBUG           = true
+	GRANT_ADDRESS   = "0x426ebb5de6b143ee65349a42f79dca970e102adc"
+
+	req_AddDevice = make([]*ADD_DEVICE, 0)
+	req_AddRule   = make([]*ADD_RULE, 0)
+	req_CheckRule = make([]*CHECK_RULE, 0)
+	DEBUG         = true
 )
 
 type ADD_DEVICE struct {
@@ -43,28 +46,22 @@ type CHECK_RULE struct {
 
 func main() {
 	log.Println("Running experiment 1")
-	// Init_AddDevice("add_device.csv")
-	// Run_AddDevice()
-	// Init_AddRule("add_rule.csv")
-	// Run_AddRule()
-	Init_CheckRule("add_rule.csv")
+	Init_AddDevice("devices.csv")
+	Run_AddDevice()
+	Run_AddRule()
 	Run_CheckRule()
 
-	log.Println("Running experiment 2")
-	// Init_AddDevice("add_device2.csv")
+	// log.Println("Running experiment 2")
+	// Init_AddDevice("devices2.csv")
 	// Run_AddDevice()
-	// Init_AddRule("add_rule2.csv")
 	// Run_AddRule()
-	Init_CheckRule("add_rule2.csv")
-	Run_CheckRule()
+	// Run_CheckRule()
 
-	log.Println("Running experiment 3")
-	// Init_AddDevice("add_device3.csv")
+	// log.Println("Running experiment 3")
+	// Init_AddDevice("devices3.csv")
 	// Run_AddDevice()
-	// Init_AddRule("add_rule3.csv")
 	// Run_AddRule()
-	Init_CheckRule("add_rule3.csv")
-	Run_CheckRule()
+	// Run_CheckRule()
 }
 
 func Init_AddDevice(filename string) {
@@ -74,35 +71,9 @@ func Init_AddDevice(filename string) {
 	}
 
 	req_AddDevice = make([]*ADD_DEVICE, 0)
-	r := csv.NewReader(csvfile)
-	isFirst := true
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			log.Fatal(err)
-		} else if isFirst {
-			isFirst = false
-			continue
-		}
-
-		requestBody, _ := json.Marshal(map[string]string{"device_id": record[0], "device_type": record[1]})
-		req, err := http.NewRequest("POST", HOST+"/device", bytes.NewBuffer(requestBody))
-		req.Header.Set("Authorization", MANAGER_ADDRESS)
-		req.Header.Set("Content-Type", "application/json")
-
-		req_AddDevice = append(req_AddDevice, &ADD_DEVICE{record[0], record[1], req})
-	}
-}
-
-func Init_AddRule(filename string) {
-	csvfile, err := os.Open(filename)
-	if err != nil {
-		log.Fatalln("Couldn't open the csv file", err)
-	}
-
 	req_AddRule = make([]*ADD_RULE, 0)
+	req_CheckRule = make([]*CHECK_RULE, 0)
+
 	r := csv.NewReader(csvfile)
 	isFirst := true
 	for {
@@ -116,12 +87,23 @@ func Init_AddRule(filename string) {
 			continue
 		}
 
-		requestBody, _ := json.Marshal(map[string]string{"device_id": record[0], "user_address": record[1]})
-		req, err := http.NewRequest("POST", HOST+"/rule", bytes.NewBuffer(requestBody))
+		// Init Req ADD DEVICE
+		requestBody, _ := json.Marshal(map[string]string{"device_id": record[0], "device_type": "1"})
+		req, _ := http.NewRequest("POST", HOST+"/device", bytes.NewBuffer(requestBody))
 		req.Header.Set("Authorization", MANAGER_ADDRESS)
 		req.Header.Set("Content-Type", "application/json")
+		req_AddDevice = append(req_AddDevice, &ADD_DEVICE{record[0], "1", req})
 
-		req_AddRule = append(req_AddRule, &ADD_RULE{record[0], record[1], req})
+		// Init Req ADD RULE
+		requestBody, _ = json.Marshal(map[string]string{"device_id": record[0], "user_address": GRANT_ADDRESS})
+		req, _ = http.NewRequest("POST", HOST+"/rule", bytes.NewBuffer(requestBody))
+		req.Header.Set("Authorization", MANAGER_ADDRESS)
+		req.Header.Set("Content-Type", "application/json")
+		req_AddRule = append(req_AddRule, &ADD_RULE{record[0], GRANT_ADDRESS, req})
+
+		req, _ = http.NewRequest("GET", HOST+"/rule?device_id="+record[0], nil)
+		req.Header.Set("Authorization", GRANT_ADDRESS)
+		req_CheckRule = append(req_CheckRule, &CHECK_RULE{record[0], GRANT_ADDRESS, req})
 	}
 }
 
@@ -163,33 +145,6 @@ func Run_AddRule() {
 		resp.Body.Close()
 	}
 	fmt.Println(time.Now().Sub(start))
-}
-
-func Init_CheckRule(filename string) {
-	csvfile, err := os.Open(filename)
-	if err != nil {
-		log.Fatalln("Couldn't open the csv file", err)
-	}
-
-	req_CheckRule = make([]*CHECK_RULE, 0)
-	r := csv.NewReader(csvfile)
-	isFirst := true
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			log.Fatal(err)
-		} else if isFirst {
-			isFirst = false
-			continue
-		}
-
-		req, err := http.NewRequest("GET", HOST+"/rule?device_id="+record[0], nil)
-		req.Header.Set("Authorization", record[1])
-
-		req_CheckRule = append(req_CheckRule, &CHECK_RULE{record[0], record[1], req})
-	}
 }
 
 func Run_CheckRule() {
