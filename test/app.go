@@ -53,20 +53,20 @@ func main() {
 	log.Println("Running experiment 1")
 	Init_AddDevice(":01")
 	Run_AddDevice()
-	// Run_AddRule()
-	// Run_CheckRule()
+	Run_AddRule()
+	Run_CheckRule()
 
-	// log.Println("Running experiment 2")
-	// Init_AddDevice(":02")
-	// Run_AddDevice()
-	// Run_AddRule()
-	// Run_CheckRule()
+	log.Println("Running experiment 2")
+	Init_AddDevice(":02")
+	Run_AddDevice()
+	Run_AddRule()
+	Run_CheckRule()
 
-	// log.Println("Running experiment 3")
-	// Init_AddDevice(":03")
-	// Run_AddDevice()
-	// Run_AddRule()
-	// Run_CheckRule()
+	log.Println("Running experiment 3")
+	Init_AddDevice(":03")
+	Run_AddDevice()
+	Run_AddRule()
+	Run_CheckRule()
 }
 
 func Init_AddDevice(currCount string) {
@@ -99,8 +99,11 @@ func Init_AddDevice(currCount string) {
 
 func Run_AddDevice() {
 	start := time.Now()
-	for _, ad := range req_AddDevice {
-		fmt.Println(ad.DeviceID)
+	for i, ad := range req_AddDevice {
+		if i%5 == 0 {
+			fmt.Println(ad.DeviceID)
+		}
+
 		resp, err := client.Do(ad.Req)
 		if err != nil {
 			fmt.Println(err)
@@ -119,8 +122,11 @@ func Run_AddDevice() {
 
 func Run_AddRule() {
 	start := time.Now()
-	for _, ar := range req_AddRule {
-		fmt.Println(ar.DeviceID, ar.GrantUser)
+	for i, ar := range req_AddRule {
+		if i%5 == 0 {
+			fmt.Println(ar.DeviceID, ar.GrantUser)
+		}
+
 		resp, err := client.Do(ar.Req)
 		if err != nil {
 			fmt.Println(err)
@@ -139,8 +145,11 @@ func Run_AddRule() {
 
 func Run_CheckRule() {
 	start := time.Now()
-	for _, cr := range req_CheckRule {
-		fmt.Println(cr.DeviceID, cr.AuthUser)
+	for i, cr := range req_CheckRule {
+		if i%5 == 0 {
+			fmt.Println(cr.DeviceID, cr.AuthUser)
+		}
+
 		resp, err := client.Do(cr.Req)
 		if err != nil {
 			fmt.Println(err)
